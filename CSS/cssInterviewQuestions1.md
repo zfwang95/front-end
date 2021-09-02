@@ -382,19 +382,19 @@ _background-color:#1e0bd1;/*IE6识别*/
   - 父级和第一个/最后一个子元素的margin合并
   - 空块级元素的margin合并。
 
-## 27.对 BFC 规范（块级格式化上下文：blockformattingcontext）的理解？
-* Block Formatting Context
+## 27.对 BFC 规范的理解？
+* Block Formatting Context, 块级格式化上下文
 * 特性
   - 独立的布局环境，与外部元素互不影响
 * 创建方式
   - 根元素/包含根元素
   - 浮动元素
-	  - {float: left/right;}
-	  - {inherit != none;}
+	  - `{float: left/right;}`
+	  - `inherit`的值不为`none`
   - 绝对定位元素
-	  - {position: absolute;}
-  - {display: inline-block/flex;}
-  - {overflow: hidden/auto}
+	  - `{position: absolute;}`
+  - `{display: inline-block/flex;}`
+  - `{overflow: hidden/auto}`
 
 ## 28.IFC 是什么？
 * 行级格式化上下文（Inline Formatting Context）
