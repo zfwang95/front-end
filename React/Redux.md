@@ -1,0 +1,21 @@
+#### Redux
+* 对Redux的简单介绍（面试题）
+  * action
+  * reducer
+* Redux的主要作用
+* 原理、工作流程
+* 异步请求处理
+  * redux-thunk
+  * redux-saga
+* 属性传递的过程和原理
+* Redux中间件
+  * 参数的类型和作用、
+  * 柯里化函数两端的参数
+  * 处理并发
+  * store和action的获取和处理
+* Redux状态管理和变量挂载到window的区别
+* connect（链接React和Redux）的具体作用
+* Redux的三大原则
+  * 单一数据源：全部State归于一个object tree，对应一个store
+  * state只读：只能通过action修改
+  * 使用纯函数进行修改：reducer应为纯函数

@@ -90,6 +90,13 @@
 		- componentDidMount(){}
 	- 卸载(unmount)
 		- componentWillUnmount(){}
+* 生命周期
+  * 生命周期方法由React主动调用
+  * 函数组件能否使用生命周期方法？？？
+  * 基本阶段（各个阶段的触发时机？？？）
+    * 挂载, 相关方法及触发顺序：constructor() >> render() >> componentDidMount()
+    * 更新, 相关方法及触发顺序：render() >> componentgDidUpdate()
+    * 卸载, 相关方法：componentWillUnmount()
 - 正确地使用State
 	- 不要直接修改state
 		- 使用setState()以保证能够在修改state的同时重新渲染组件
@@ -100,6 +107,60 @@
 - 数据是向下流动的
 	- 即，State中的数据只能传入和影响对应的下级组件
 - 有状态/无状态组件？？？
+* 常用的生命周期方法：
+  * render()
+    * class组件唯一必须实现的方法
+    * 应为纯函数
+    * shouldComponentUpdate()返回false时，不会调用render()（即不更新组件）
+  * constructor()
+    * 用于初始化state或进行方法绑定（为事件处理函数绑定实例，利用bind？？？）
+    JS中，class方法默认不绑定this，React目前保持这一默认，不过已有相关语法（class fields方法，使用箭头函数的形式定义一个方法，目前还在实验阶段）可实现不用额外绑定一个方法和this。
+    * 第一句应为super(props)（为何不直接写入React底层？？？组件没有props时不用写？）
+    * 在不见挂载前会调用构造函数
+  * componentDidMount()
+    * 在组件挂载后立即调用
+    * 内容（方法中一般包含的操作）：
+      * 依赖于DOM节点的初始化
+      * 添加订阅
+			* 实例化网络请求
+  * componentDidUpdate()
+    * 更新后立即调用
+    * 首次渲染不调用
+    * 内容：DOM操作、网络请求
+    * 方法本身也可能再次更新组件，从而再次触发方法，故一般用条件语句包裹目标操作
+    * shouldComponentUpdate()返回false时不调用
+  * componentWillUnmount()
+    * 组件卸载之前直接调用
+    * 内容：
+      * 清除timer
+      * 取消网络请求
+      * 清除订阅
+    * setState()等操作将无效，组件卸载后永不再挂载
+  * shouldComponentUpdate()
+    * 用法（参数）：shouldComponentUpdate(nextProps, nextState)
+* React API
+  * setState()：
+    * 用法：setState(updater/stateChange, [callback])
+      * 接收一个函数（updater）的示例：
+      ```javascript
+      this.setState((state, props) => {
+        return {counter: state.counter + props};
+      }); // updater的返回值会和state进行浅合并
+      ```
+      * 接收一个对象（stateChange）的示例：
+      ```javascript
+      this.setState({quantity: 2});
+      ```
+    * 作用：将对组件state的更改排入队列，并通知React需要使用更新后的state重新渲染此组件及其子组件
+    * 批量推迟更新，state的更新不一定立即生效。
+    在setState的callback或组件的componentDidUpdate中对state进行读取可保证获取的state最新
+    * setState是异步的：
+      * 接收一个对象时，setState读取`this.state`中的属性，而`this.state`在组件重新渲染后才会变化，不随setState()的执行即时变化
+      * 接收一个函数时，setState读取`state`，可以认为是以`this.state`为基础，而且随setState()的执行而立即变化的临时数据
+      * 综上，要利用两次组件渲染之间的即时的state时，需要利用updater
+  * forceUpdate():
+    * 用法：`component.forceUpdate(callback)`
+    * 使用场景: state和props不变却又需要重新渲染组件时（即，render()依赖于其他数据）具体例子？？？
 ## 五、事件处理
 #### ——React合成事件
 - SyntheticEvent
@@ -138,8 +199,33 @@
 ## 九、状态提升
 ## 十、组合 vs 继承
 ## 十一、React 哲学
-#### ——Ajax
-  - 组件的数据来源，通常是通过 Ajax 请求从服务器获取
+#### —— React项目文件结构
+  * 方案一：按功能/路由划分，同一功能/路由相关的js、css、test.js文件置于同一文件夹下
+  * 方案二：按功能类型划分，如提供功能/API的js文件及相关的test.js归为一组
+  * 基本原则：嵌套层数尽可能少，一个项目最多4层；开始一个项目时，设计一个简单、可用的文件组织结构即可，实际中总是要多次修改的
+  * 技巧：先将所有文件归入一个文件夹下，再从明确的文件开始逐个归类
+#### —— React术语
+* 单页面应用（single-page application）
+	* 单个HTML页面 + 相关资源（JS、css）
+	* 页面不会（整个）重新加载
+* Compiler（编译器）：如Babel，将ES6转换为旧语法以兼容旧版浏览器
+* Bandler（打包工具）：如webpack、Browsery，将多个JS、css文件组合，从而优化浏览器效率
+* Package管理工具：如npm、yarn
+* CDN：Content Delivery Network，内容分发网络
+* JSX：为JS的语法扩展；JSX最终被编译为React.creatElement()函数并调用，生成React元素（普通JS对象）
+* props.children：即组件被调用时包含的内容，如`<Welcome>Hello World!</Welcome>`中的“Hello World！”。
+可用于以类似普通HTML的形式添加组件的文本内容并获取、编辑
+* 受控组件 & 非受控组件：
+	* 受控组件：元素值受React控制，如通过React读取并重新赋值的`<input>`
+	* 非受控组件：元素值不受React影响，如普通的不额外处理的`<input>`
+* key：用于标记数组中的元素；同一数组內各个兄弟元素的key彼此唯一即可
+* 协调：props、state有变化时，比较变化前后的虚拟DOM，虚拟DOM有变化才会更新真实DOM
+#### —— Ajax
+* 组件的数据来源，通常是通过 Ajax 请求从服务器获取
+* 如何在React中发起AJAX请求
+  * 借助AJAX库： Axios, JQuery AJAX
+  * 利用浏览器内置的window.fetch
+* 应在componentDidMount中发起AJAX请求
 
 # 进阶
 ## 一、高阶组件
