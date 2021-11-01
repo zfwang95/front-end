@@ -183,7 +183,7 @@
 - JSX回调函数中的this
 	- JS中class的方法默认不会绑定this
 		- 未绑定时，在调用对应函数时this的值为undefined
-	- 为class中的方法绑定this
+	- 为class中的方法绑定this（this默认为undefined）
 		- 方式一：在class 的constructor中绑定
 			- Function.prototype.bind
 		- 方式二：使用 public class fields 语法

@@ -7,6 +7,8 @@
   * 和生命周期的关系
 * useState使用数组而不是对象
 * 事件机制、事件代理
+  * 事件机制：绑定于virtual DOM的事件映射到real DOM
+
 * 类组件和函数组件的具体差异、使用场景
 * state、props、refs
   * state在组件内部定义、管理，类似函数的内部声明变量
@@ -47,12 +49,22 @@
   | 事件函数处理语法 | 函数 | 字符串 |
   |阻止浏览器默认行为|preventdefault()|return false|
   * 向事件处理函数传递参数的方法
-    * 使用箭头函数，需显示地传递事件对象e，如`<button onClick={(e) => this.deleteRow(id, e)}>Delete Row</button>`
-    * 通过Function.prototype.bind来实现，事件对象e会被隐式传递，如`<button onClick={this.deleteRow.bind(this, id)}>Delete Row</button>`
+    * 使用箭头函数，需显示地传递事件对象e，如
+    ```JSX
+    <button onClick={(e) => this.deleteRow(id, e)}>
+      Delete Row
+    </button>
+    ```
+    * 通过Function.prototype.bind来实现，事件对象e会被隐式传递，如
+    ```HTML
+    <button onClick={this.deleteRow.bind(this, id)}>
+      Delete Row
+    </button>
+    ```
     
-  * 合成事件：React中模拟原生DOM事件的一个事件对象
+  * 合成事件（SyntheticEvent）：React中模拟原生DOM事件的一个事件对象
     优点：对各个浏览器的兼容性好； 方便统一管理； 统一存放于一个数组，避免频繁的垃圾回收
-    注意：原生事件优先于合成事件执行，故需避免混用
+    注意：原生事件优先于合成事件执行，故需避免混用（原生事件>>react合成事件>>挂载于document上的非react事件；react事件挂载于document）
   * 监听、订阅、移除、冒泡
   * 事件的用法规范
 * 前端框架的作用（原生JS的不足）
@@ -61,17 +73,59 @@
   * 组件化、代码复用
 * React Native：使用React语言进行移动端开发
 * 虚拟DOM + Diff算法：减少对真实DOM的操作
-  * 虚拟DOM：调用渲染函数会修改虚拟DOM
+  * 虚拟DOM（virtual DOM）：
+    * 调用渲染函数会修改虚拟DOM
+    * 虚拟DOM是一个JS数组对象（优点：JS比对要快过DOM比对；在没有DOM概念的平台也可以运行，如iOS、Android）
+  * Diff算法
+    * 同层比对
+    * 
 * React的具体使用
   * 最简化的使用：HTML中的DOM容器（HTML标签） + Script标签 + React组件
   具体说明：
     * DOM容器的示例：`<div id="xx"></div>`
     * Script标签：2个用于加载React的`<script>`，以及加载组件代码的`<script>`
     * React组件：此处指描述React组件的JS文件
-  * 生产环境部署的相关优化：
+  * 生产环境部署的相关优化（optimizing performance）：
     1.压缩JS代码
     2.如果是外部加载React的方式，在生产环境应使用production.mini.js结尾的版本
+    3.通过build生成生产版本
+    4.使用单文件版的React和ReactDOM（即外部加载的方式？？？）
+    5.brunch的生产构建优化？？？
 * React的功能实现优先通过传递属性实现，而不是在组件里暴露方法
+* virtual DOM
+* diff算法
+* Reactpath、事件系统
+* view层渲染
+* Fiber架构：组件即fiber节点？？？
+* 优先级机制
+* React更新
+  * render阶段
+  * commit阶段
+* React无内置Ajax，需用axios
+* Babel将JSX转换成React.createElement(xxx)
+* createElement生成vurtual DOM
+* ReactDOM()、render()将virtual DOM转化成真实DOM
+* ReactElement（即virtual DOM）的typeof判断结果为symbol类型的变量，可防止XSS（外来json对象因不支持symbol会被过滤）
+* React路由配置：
+  * 作用：向router说明URL匹配及匹配后的代码执行
+  * 用法：
+    * 利用`<link>`: `<link to=""></link>`
+    * 利用`<Router>`：
+    ```JSX
+    <Router>
+      <Route path="/" component={APP}>
+        <Route path="abount" component={About}/>
+        <Route path="inbox" component={Inbox}>
+          <Route path="messages/id" component={message}/>
+        </Route>
+      </Route>
+    </Router>
+    ```
+  * `<IndexRoute/>`配合this.props.children可不用配置path，直接在当前path的基础上添加组件
+  * 在path中使用绝对路径和相对路径的效果是一样的
+  * `<Redirect>`能添加一个设定过的url，用于跳转到对应的组件
+  * 
+
 
 
 #### JQuery
@@ -91,8 +145,24 @@
 * 组件状态
   * 组件内部状态通过state储存
   * redux专门用作状态管理（action、reducer）
-  * 在
 * 组件通信（即props？？？）
+* 组件代码的复用只推荐用组合的方式，不推荐用继承的方式
+  * 组合-包含关系：1.props.children的形式（例子？？？）；2.复用的组件作为props传入
+  * 组合-特例关系：为已有组件传入特定props并包装成新组件
+* 组件的各个阶段
+  * 挂载
+    1.componentWillMount
+    2.render
+    3.更新DOM、refs
+    4.componentDidMount
+  * 更新
+    1.componentWillRecieveProps（props更新时）
+    2.shouldComponentUpdate（不返回false时执行第3步，否则跳过）
+    3.更新DOM、refs
+    4.componentWillUpdate
+  * 注销（卸载）
+    1.componentUillUnmount
+  注：挂载和更新阶段各自可分为render阶段和commit阶段（产生实际影响）
 
 #### Redux
 * Redux是JS状态管理器，针对state的变化，属于可预测化状态管理
